@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gen5 Extractor</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%2314213d%27/%3E%3Cg fill=%27%23fff%27%3E%3Ccircle cx=%278%27 cy=%278%27 r=%273%27/%3E%3Ccircle cx=%2716%27 cy=%278%27 r=%273%27/%3E%3Ccircle cx=%2724%27 cy=%278%27 r=%273%27/%3E%3Ccircle cx=%278%27 cy=%2716%27 r=%273%27/%3E%3Ccircle cx=%2724%27 cy=%2716%27 r=%273%27/%3E%3Ccircle cx=%278%27 cy=%2724%27 r=%273%27/%3E%3Ccircle cx=%2716%27 cy=%2724%27 r=%273%27/%3E%3Ccircle cx=%2724%27 cy=%2724%27 r=%273%27/%3E%3C/g%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%273.4%27 fill=%27%23e0407f%27/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#14213d">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="style.css?v=10">
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap bar-in">
+    <a class="brand" href="./" aria-label="Gen5 Extractor">
+      <svg class="glyph" viewBox="0 0 24 24" aria-hidden="true">
+        <g fill="currentColor"><circle cx="5" cy="5" r="2.1"/><circle cx="12" cy="5" r="2.1"/><circle cx="19" cy="5" r="2.1"/><circle cx="5" cy="12" r="2.1"/><circle cx="19" cy="12" r="2.1"/><circle cx="5" cy="19" r="2.1"/><circle cx="12" cy="19" r="2.1"/><circle cx="19" cy="19" r="2.1"/></g>
+        <circle class="glyph-dot" cx="12" cy="12" r="2.6"/>
+      </svg>
+      <span>Gen5 Extractor</span>
+    </a>
+    <div class="bar-right">
+    <button type="button" class="btn small" id="install" hidden>
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m0 0L4.8 6.8M8 10l3.2-3.2M2.5 13h11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Install app
+    </button>
+    <p class="private">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 7V5.2a3.5 3.5 0 0 1 7 0V7M3.5 7h9v6.5h-9z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Your file stays in this browser
+    </p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="input-card" class="input">
+    <div class="hero">
+      <h1>Open a Gen5 file.</h1>
+      <p class="lede">Split it by plate and read, name your wells, and take away Excel files, CSVs and graphs.</p>
+    </div>
+
+    <label class="drop" id="drop" tabindex="0">
+      <input type="file" id="file" accept=".xpt,*/*" hidden>
+      <span class="drop-main">
+        <span class="drop-title" id="drop-title">Drop an <b>.xpt</b> file here</span>
+        <span class="drop-sub" id="drop-sub">or click to choose one</span>
+      </span>
+      <span class="drop-action" id="drop-action">Choose file</span>
+    </label>
+
+    <div class="run">
+      <label class="check"><input type="checkbox" id="plots" checked><span>Include graph files in the download</span></label>
+      <button id="go" class="btn primary" disabled>Extract</button>
+    </div>
+
+    <div class="status" id="status" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      <span id="status-text">Starting...</span>
+      <button type="button" class="linkbtn" id="log-toggle" hidden>Details</button>
+    </div>
+    <pre class="log" id="log" hidden></pre>
+    <div class="error" id="error" hidden></div>
+  </section>
+
+  <section id="results" hidden>
+    <div class="results-head">
+      <div>
+        <h2 id="results-title">Results</h2>
+        <p class="meta" id="results-meta"></p>
+      </div>
+      <button id="zip" class="btn primary">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8m0 0L4.8 6.8M8 10l3.2-3.2M2.5 13h11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="zip-label">Download everything</span>
+      </button>
+    </div>
+
+    <nav class="tabs" id="tabs">
+      <button data-tab="graphs" class="active">Graphs</button>
+      <button data-tab="names">Names &amp; notes</button>
+      <button data-tab="tables">Summary</button>
+      <button data-tab="files">Files</button>
+    </nav>
+
+    <div class="pane" id="pane-wells">
+      <div class="toolbar">
+        <div class="ctl"><span class="lbl">Read</span><select id="w-read"></select></div>
+        <div class="ctl"><span class="lbl">Graph</span><select id="w-kind"></select></div>
+        <div class="ctl"><span class="lbl">Plates</span><div id="w-plates" class="seg multi"></div></div>
+        <div class="ctl"><span class="lbl">Wells</span>
+          <div class="seg"><button id="mode-all" class="active">All</button><button id="mode-single">One</button><button id="mode-multi">Several</button></div>
+        </div>
+      </div>
+
+      <div class="wellbody" id="wellbody">
+        <div class="mapcol" id="mapcol" hidden>
+          <div id="platemap" class="platemap" aria-label="96-well plate"></div>
+          <div class="maptools">
+            <button class="btn small" id="w-all">Select all with data</button>
+            <button class="btn small" id="w-clear">Clear</button>
+          </div>
+          <div class="typed">
+            <input id="w-text" type="text" placeholder="A1, B2, A1:C3, A, 2" autocomplete="off" aria-label="Type wells">
+            <button class="btn small" id="w-apply">Apply</button>
+          </div>
+          <p class="hint" id="w-hint"></p>
+        </div>
+
+        <div class="viewcol">
+          <div class="wstatus" id="w-status">Click a well on the plate map.</div>
+          <figure class="fig" id="w-fig" hidden><img id="w-img" alt="Graph for the selected wells"></figure>
+          <div class="dlrow" id="w-dl" hidden>
+            <button class="btn small" id="w-dl-png">Graph (PNG)</button>
+            <button class="btn small" id="w-dl-csv">Data (CSV)</button>
+            <button class="btn small" id="w-dl-xlsx">Data and notes (Excel)</button>
+          </div>
+          <div class="tablewrap" id="w-stats-wrap" hidden><table id="w-stats"></table></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pane" id="pane-names" hidden>
+      <p class="intro">Name plates and wells and add notes, then apply. Graphs update at once, and the names and notes are saved in every graph and file you download.</p>
+      <div class="namecols">
+        <div class="stack">
+          <section>
+            <h3 class="sec">Plates</h3>
+            <div id="nm-plates" class="namegrid"></div>
+          </section>
+          <section>
+            <h3 class="sec">Notes</h3>
+            <textarea id="nm-notes" rows="8" placeholder="Type notes here, or load a .txt file"></textarea>
+            <div class="row-gap"><button type="button" class="btn small" id="nm-load">Load from a .txt file</button><input type="file" id="nm-file" accept=".txt,text/plain" hidden></div>
+          </section>
+        </div>
+        <section>
+          <h3 class="sec">Wells <span class="muted">named separately for each plate</span></h3>
+          <div class="wellpick">
+            <label class="inl"><span class="lbl">Plate</span><select id="nm-plate"></select></label>
+          </div>
+          <div class="tablewrap namewells"><table id="nm-wells"></table></div>
+        </section>
+      </div>
+      <div class="applyrow"><button class="btn primary" id="nm-apply">Apply</button><span id="nm-status" class="muted" role="status"></span></div>
+    </div>
+
+    <div class="pane" id="pane-tables" hidden>
+      <div class="stale-banner" id="stale" hidden>Names or notes changed. These tables update when you click <b>Download everything</b>.</div>
+      <div class="tablewrap"><table id="tbl"></table></div>
+      <h3 class="sec spaced">README</h3>
+      <pre class="readme" id="readme"></pre>
+    </div>
+
+    <div class="pane" id="pane-files" hidden>
+      <div class="stale-banner" id="stale2" hidden>Names or notes changed. These files update when you click <b>Download everything</b>.</div>
+      <div id="filelist"></div>
+    </div>
+  </section>
+</main>
+
+<div class="lightbox" id="lightbox" hidden><img id="lightbox-img" alt=""></div>
+<footer class="wrap foot">Processing runs on your computer with Python (Pyodide). Nothing is uploaded. After the first visit the app also works offline. To install it: use the Install button, or in Safari choose File, then Add to Dock.</footer>
+<script src="app.js?v=10"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gen5-extractor"
+version = "1.0.0"
+description = "Extract BioTek Gen5 .xpt plate-reader files into Excel and CSV, with analysis and graphs."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "olefile",
+    "numpy>=2.0",
+    "pandas>=2.0",
+    "openpyxl",
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+gui = ["PySide6"]          # only needed for the desktop window
+
+[project.scripts]
+gen5-extract = "gen5_extract:main"
+
+[project.gui-scripts]
+gen5-extract-gui = "gen5_extract:gui"
+
+[tool.setuptools]
+py-modules = ["gen5_extract"]
